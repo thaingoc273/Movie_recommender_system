@@ -10,14 +10,31 @@ import streamlit as st
 
 # Parameters
 
-n = 5
-mean_threshold = 4
-count_threshold = 50
+st.set_page_config(layout="wide")
 
 # Main
 def main():
-    (link, movie, rating, tag, rating_pivot, rating_agg) = load_data()
-
+    #(link, movie, rating, tag, rating_pivot, rating_agg) = load_data()
+   
+    st.title("Movie Recommender - Group 1")
+    st.sidebar.markdown("## Choose type of recommender")
+    page = st.sidebar.selectbox("", ["Popularity", "Item-item base", "User-user base" ])
+    if page == "Popularity":
+        n = st.sidebar.selectbox("Select number of top movies ", np.arange(4, 10, 1))
+        movie_recommend = recommender_popularity(n, mean_threshold, count_threshold)
+        st.markdown(f"## Top {n} popular movies")
+        st.dataframe(movie_recommend)
+    elif page == "Item-item base":
+        movie_title = st.sidebar.selectbox('Select a movie that you like', lst_movie)
+        n = st.sidebar.selectbox('Select the number of movie you want to see', np.arange(1, 10))
+        movieId = movie[movie.title == movie_title]['movieId']       
+        movie_recommend = recommender_item_base(rating_pivot, movieId.to_list()[0], n, mean_threshold, count_threshold)
+        #st.write(movieId)#.to_list()[0])
+        st.markdown(f"## Top {n} recommended movies")
+        st.dataframe(movie_recommend)
+    elif page == "User-user base":
+        user_id = st.sidebar.selectbox('Select the user ID', ['Ngoc', 'Lam', 'Nguyen'])
+        
 # Load dataset
 
 @st.cache
@@ -103,8 +120,12 @@ def recommender_user_base(rating_pivot, n, user_id, method):
     return recommendations
 
 
-st.title("Movie Recommender - Group 1")
 
 
 if __name__ == "__main__":
+    n = 5
+    mean_threshold = 4
+    count_threshold = 50
+    (link, movie, rating, tag, rating_pivot, rating_agg) = load_data()
+    lst_movie = movie['title'].to_list()
     main()
