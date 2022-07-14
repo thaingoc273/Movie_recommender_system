@@ -23,7 +23,7 @@ def main():
    
     st.title("Movie Recommender - Group 1")
     st.sidebar.markdown("## Choose type of recommender")
-    page = st.sidebar.selectbox("", ["Popularity", "Item-item base", "User-user base", "Singular Value Decomposition (SVD)" ])
+    page = st.sidebar.selectbox("", ["Popularity", "Item-item base", "User-user base" ])
     if page == "Popularity":
         n = st.sidebar.selectbox("Select number of top movies ", np.arange(4, 10, 1))
         movie_recommend = recommender_popularity(n, mean_threshold, count_threshold)
@@ -44,21 +44,21 @@ def main():
         movie_recommend = recommender_user_base(n, user_id, method)
         st.markdown(f"## Top {n} recommended movies with {method} similarity")
         st.dataframe(movie_recommend)
-    elif page == "Singular Value Decomposition (SVD)":
-        #method = st.sidebar.selectbox("Select item base or user base method", ["Item-item base", "User-user base"])
+#     elif page == "Singular Value Decomposition (SVD)":
+#         #method = st.sidebar.selectbox("Select item base or user base method", ["Item-item base", "User-user base"])
 
-        movie_title = st.sidebar.selectbox('Select a movie that you like', lst_movie)
-        n = st.sidebar.selectbox('Select the number of movie you want to see', np.arange(1, 10))
-        movieId = movie[movie.title == movie_title]['movieId']
-        movie_recommend = rating_item_ALS(movieId.to_list()[0], n)
-        st.markdown(f"## Top {n} recommended movies")
-        st.dataframe(movie_recommend)
-        # elif method == "User-user base":
-        #     user_id = st.sidebar.selectbox('Select the user ID', lst_user)
-        #     n = st.sidebar.selectbox('Select the number of movie you want to see', np.arange(1, 10))
-        #     movie_recommend = rating_user_ALS(user_id, n)
-        #     st.markdown(f"## Top {n} recommended movies")
-        #     st.write(movie_recommend)        
+#         movie_title = st.sidebar.selectbox('Select a movie that you like', lst_movie)
+#         n = st.sidebar.selectbox('Select the number of movie you want to see', np.arange(1, 10))
+#         movieId = movie[movie.title == movie_title]['movieId']
+#         movie_recommend = rating_item_ALS(movieId.to_list()[0], n)
+#         st.markdown(f"## Top {n} recommended movies")
+#         st.dataframe(movie_recommend)
+#         # elif method == "User-user base":
+#         #     user_id = st.sidebar.selectbox('Select the user ID', lst_user)
+#         #     n = st.sidebar.selectbox('Select the number of movie you want to see', np.arange(1, 10))
+#         #     movie_recommend = rating_user_ALS(user_id, n)
+#         #     st.markdown(f"## Top {n} recommended movies")
+#         #     st.write(movie_recommend)        
 
 @st.cache
 def load_data():    
