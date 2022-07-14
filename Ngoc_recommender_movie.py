@@ -22,10 +22,10 @@ def main():
 
 @st.cache
 def load_data():    
-    link = pd.read_csv('data/ml-latest-small/links.csv')
-    movie = pd.read_csv('data/ml-latest-small/movies.csv')
-    rating = pd.read_csv('data/ml-latest-small/ratings.csv')
-    tag = pd.read_csv('data/ml-latest-small/tags.csv')
+    link = pd.read_csv('data/links.csv')
+    movie = pd.read_csv('data/movies.csv')
+    rating = pd.read_csv('data/ratings.csv')
+    tag = pd.read_csv('data/tags.csv')
     rating_pivot = pd.pivot_table(data=rating, values='rating', columns='movieId', index = 'userId')
     rating_agg = rating.groupby('movieId').agg(mean_rating = ('rating', 'mean'), count_rating = ('rating', 'count')).reset_index()
     return (link, movie, rating, tag, rating_pivot, rating_agg)
