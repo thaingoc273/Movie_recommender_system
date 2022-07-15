@@ -8,8 +8,8 @@
 
 We say a movie a good recommendation if it satisfies two conditions:
 
-![image](/picture/number_rating.jpg)
 - The mean of rating should be greater than 4
 - The number of rating should be not less than 50
+![image](/picture/number_rating.jpg)
 ## 3. Streamlit app
 [Link to the app](https://thaingoc273-movie-recommender-sys-ngoc-recommender-movie-bqbglf.streamlitapp.com/)
