@@ -6,4 +6,5 @@
 ## 2. Recommendation method 
 ![image](/picture/algorithm.JPG)
 
+## 3. Streamlit app
 [Link to the app](https://thaingoc273-movie-recommender-sys-ngoc-recommender-movie-bqbglf.streamlitapp.com/)
