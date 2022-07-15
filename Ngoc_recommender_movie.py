@@ -22,6 +22,11 @@ def main():
     #(link, movie, rating, tag, rating_pivot, rating_agg) = load_data()
    
     st.title("Movie Recommender - Group 1")
+   
+    if (st.sidebar.checkbox("Show the setting")):
+        st.image('picture/number_rating.jpg')
+        st.write('The mean of rating should be greater than 4')
+        st.write('The number of rating should be not less than 50')
     st.sidebar.markdown("## Choose type of recommender")
     page = st.sidebar.selectbox("", ["Popularity", "Item-item base", "User-user base", "Singular Value Decomposition (SVD)"])
     if page == "Popularity":
