@@ -23,7 +23,7 @@ def main():
    
     st.title("Movie Recommender - Group 1")
     st.sidebar.markdown("## Choose type of recommender")
-    page = st.sidebar.selectbox("", ["Popularity", "Item-item base", "User-user base" ])
+    page = st.sidebar.selectbox("", ["Popularity", "Item-item base", "User-user base", "Singular Value Decomposition (SVD)"])
     if page == "Popularity":
         n = st.sidebar.selectbox("Select number of top movies ", np.arange(4, 10, 1))
         movie_recommend = recommender_popularity(n, mean_threshold, count_threshold)
@@ -44,23 +44,24 @@ def main():
         movie_recommend = recommender_user_base(n, user_id, method)
         st.markdown(f"## Top {n} recommended movies with {method} similarity")
         st.dataframe(movie_recommend)
-#     elif page == "Singular Value Decomposition (SVD)":
-#         #method = st.sidebar.selectbox("Select item base or user base method", ["Item-item base", "User-user base"])
+    elif page == "Singular Value Decomposition (SVD)":
+        method = st.sidebar.selectbox("Select item base or user base method", ["Item-item base", "User-user base"])
+        if method == "Item-item base":
+            movie_title = st.sidebar.selectbox('Select a movie that you like', lst_movie)
+            n = st.sidebar.selectbox('Select the number of movie you want to see', np.arange(1, 10))
+            movieId = movie[movie.title == movie_title]['movieId']
+            #st.write(movieId.to_list()[0])
+            movie_recommend = rating_item_ALS(movieId.to_list()[0], n)
+            st.markdown(f"## Top {n} recommended movies")
+            st.dataframe(movie_recommend)
+        elif method == "User-user base":
+            user_id = st.sidebar.selectbox('Select the user ID', lst_user)
+            n = st.sidebar.selectbox('Select the number of movie you want to see', np.arange(1, 10))
+            movie_recommend = rating_user_ALS(user_id, n)
+            st.markdown(f"## Top {n} recommended movies")
+            st.write(movie_recommend)        
 
-#         movie_title = st.sidebar.selectbox('Select a movie that you like', lst_movie)
-#         n = st.sidebar.selectbox('Select the number of movie you want to see', np.arange(1, 10))
-#         movieId = movie[movie.title == movie_title]['movieId']
-#         movie_recommend = rating_item_ALS(movieId.to_list()[0], n)
-#         st.markdown(f"## Top {n} recommended movies")
-#         st.dataframe(movie_recommend)
-#         # elif method == "User-user base":
-#         #     user_id = st.sidebar.selectbox('Select the user ID', lst_user)
-#         #     n = st.sidebar.selectbox('Select the number of movie you want to see', np.arange(1, 10))
-#         #     movie_recommend = rating_user_ALS(user_id, n)
-#         #     st.markdown(f"## Top {n} recommended movies")
-#         #     st.write(movie_recommend)        
-
-@st.cache
+#@st.cache
 def load_data():    
     link = pd.read_csv('data/links.csv')
     movie = pd.read_csv('data/movies.csv')
@@ -76,7 +77,7 @@ def load_data():
 
 # The popularity recommendation system
 
-
+#@st.cache
 def recommender_popularity(n, mean_threshold, count_threshold):
     #rating_agg = rating.groupby('movieId').agg(mean_rating = ('rating', 'mean'), count_rating = ('rating', 'count')).reset_index()
     rating_threshold = rating_agg.query('mean_rating>@mean_threshold and count_rating>@count_threshold')
@@ -91,7 +92,7 @@ def recommender_popularity(n, mean_threshold, count_threshold):
 #print(recommender_popularity(n, mean_threshold, count_threshold))
 
 # Second recommendation system based on items-items
-
+#@st.cache
 def number_common_rating_by_user(movieId):
     movie_rating = rating_pivot[movieId]
     lst_number = []
@@ -101,6 +102,7 @@ def number_common_rating_by_user(movieId):
     dataframe = pd.DataFrame(lst_number,columns=['common_two_movie'], index=rating_pivot.columns)
     return dataframe    
 
+#@st.cache
 def recommender_item_base(movieId, n, mean_threshold, count_threshold):
     movie_rating = rating_pivot[movieId]
     corr_movie = rating_pivot.corrwith(movie_rating)
@@ -117,7 +119,7 @@ def recommender_item_base(movieId, n, mean_threshold, count_threshold):
 
 
 # User-user base recommendation system
-
+#@st.cache
 def recommender_user_base(n, user_id, method):
     rating_pivot_fillna = rating_pivot.fillna(0)
     
@@ -143,18 +145,21 @@ def recommender_user_base(n, user_id, method):
     return recommendations
 
 def rating_user_ALS(user_id, n): # function to give recommendations based on userID with ALS
-    rating_pivot_spare_matrix = csr_matrix(rating_pivot)
+    rating_pivot_fillna = rating_pivot.fillna(0)
+    rating_pivot_spare_matrix = csr_matrix(rating_pivot_fillna)
     model = pickle.load(open("als_model.pkl", 'rb'))
-    user_recommend = model.recommend(user_id, rating_pivot_spare_matrix[user_id], N = n)
-    df_recommend = pd.DataFrame(np.array(user_recommend).T, columns=['movieId', 'rating_als'])
+    user_recommend = model.recommend(lst_user_Id.index(user_id), rating_pivot_spare_matrix[lst_user_Id.index(user_id)], N = n)
+    movie_recommend = [lst_movie_Id[i] for i in user_recommend[0]]    
+    df_recommend = pd.DataFrame(np.array([movie_recommend, user_recommend[1]]).T, columns=['movieId', 'rating_als'])
     df_recommend_merg_movie = df_recommend.merge(movie, on = 'movieId', how = 'left')
     df_recommend_merg_movie['movieId'] = df_recommend_merg_movie['movieId'].astype('int32')
     return df_recommend_merg_movie
 
 def rating_item_ALS(movie_Id, n_similar):
     model = pickle.load(open('als_model.sav', 'rb'))
-    movie_similar = model.similar_items(movie_Id, n_similar+1)
-    df_recommend = pd.DataFrame(np.array(movie_similar).T, columns=['movieId', 'movie_corr'])
+    movie_similar = model.similar_items(lst_movie_Id.index(movie_Id), n_similar+1) # Get index of movie_Id to refer to column in sparse matrix
+    movie_recommend = [lst_movie_Id[i] for i in movie_similar[0]] # Back from index to movieId
+    df_recommend = pd.DataFrame(np.array([movie_recommend, movie_similar[1]]).T, columns=['movieId', 'movie_corr'])
     df_recommend = df_recommend[df_recommend['movieId'] != movie_Id]
     df_recommend_merg_movie = df_recommend.merge(movie, on = 'movieId', how = 'left')
     df_recommend_merg_movie['movieId'] = df_recommend_merg_movie['movieId'].astype('int32')
@@ -170,6 +175,8 @@ if __name__ == "__main__":
     mean_threshold = 4
     count_threshold = 50
     (link, movie, rating, tag, rating_pivot, rating_agg) = load_data()
+    lst_user_Id = rating_pivot.index.to_list()
+    lst_movie_Id = rating_pivot.columns.to_list()
     lst_movie = movie['title'].to_list()
     lst_user = rating['userId'].unique()
     main()
