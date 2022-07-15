@@ -5,3 +5,5 @@
 
 ## 2. Recommendation method 
 
+
+[Link to the app](https://thaingoc273-movie-recommender-sys-ngoc-recommender-movie-bqbglf.streamlitapp.com/)
