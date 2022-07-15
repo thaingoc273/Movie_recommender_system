@@ -33,7 +33,7 @@ def main():
         movie_title = st.sidebar.selectbox('Select a movie that you like', lst_movie)
         n = st.sidebar.selectbox('Select the number of movie you want to see', np.arange(1, 10))
         movieId = movie[movie.title == movie_title]['movieId']       
-        movie_recommend = recommender_item_base(movieId.to_list()[0], n, mean_threshold, count_threshold)
+        movie_recommend = recommender_item_base(movieId.to_list()[0], n, mean_threshold_item, count_threshold_item)
         #st.write(movieId)#.to_list()[0])
         st.markdown(f"## Top {n} recommended movies")
         st.dataframe(movie_recommend)
@@ -113,7 +113,7 @@ def recommender_item_base(movieId, n, mean_threshold, count_threshold):
     df_corr = df_corr.merge(rating_agg)
     df_corr = df_corr.merge(movie)
     df_corr = df_corr[(df_corr['mean_rating']>=mean_threshold)&(df_corr['count_rating']>=count_threshold)]
-    #df_corr = df_corr[df_corr.movieId != movieId]
+    df_corr = df_corr[df_corr.movieId != movieId]
     df_corr = df_corr.sort_values(by='Pearson_corr', ascending = False).head(n)    
     return df_corr
 
@@ -174,6 +174,8 @@ if __name__ == "__main__":
     n = 5
     mean_threshold = 4
     count_threshold = 50
+    mean_threshold_item = 3
+    count_threshold_item = 20
     (link, movie, rating, tag, rating_pivot, rating_agg) = load_data()
     lst_user_Id = rating_pivot.index.to_list()
     lst_movie_Id = rating_pivot.columns.to_list()
