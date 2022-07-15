@@ -25,6 +25,8 @@ def main():
    
     if (st.sidebar.checkbox("Show the setting")):
         st.image('picture/number_rating.jpg')
+        st.markdown('### Dataset: 100,000 ratings applied to 9,000 movies by 600 users')
+        st.image('picture/algorithm.JPG')
         st.markdown('# 1. Popularity recommender')
         st.markdown('The mean of rating should be greater than **4**')
         st.markdown('The number of rating should be not less than **50**')
