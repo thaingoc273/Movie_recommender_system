@@ -25,8 +25,17 @@ def main():
    
     if (st.sidebar.checkbox("Show the setting")):
         st.image('picture/number_rating.jpg')
-        st.write('The mean of rating should be greater than 4')
-        st.write('The number of rating should be not less than 50')
+        st.markdown('# 1. Popularity recommender')
+        st.markdown('The mean of rating should be greater than **4**')
+        st.markdown('The number of rating should be not less than **50**')
+        st.markdown('# 2. Item-item base recommender')
+        st.write('The mean of rating should be greater than **3**')
+        st.write('The number of rating should be not less than **20**')
+        st.markdown('# 3. User-user base recommender')
+        st.write('We use two similarity distances **cosine** and **Person correlation**')
+        st.markdown('# 4. Singular values decomposition (SVD)')
+        st.write('Decompose the large matrix (pivot table) of users and movies into the product of two small matricies')
+        st.write('Choose **k=30** for low dimension matrices')        
     st.sidebar.markdown("## Choose type of recommender")
     page = st.sidebar.selectbox("", ["Popularity", "Item-item base", "User-user base", "Singular Value Decomposition (SVD)"])
     if page == "Popularity":
